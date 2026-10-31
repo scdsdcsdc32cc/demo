@@ -1,18 +1,16 @@
-
 const path = require('path');
 const { v4: uuid } = require('uuid');
 const express = require('express');
-
 const app = express();
 
-// EJS setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'ejs');
-
-// Middleware
-app.use(express.urlencoded({ extended: true }));
-
-// Fake database
+//To parse form data in POST request body:
+app.use(express.urlencoded({ extended: true }))
+// To parse incoming JSON in POST request body:
+app.use(express.json())
+// Views folder and EJS setup:
+app.set('views', path.join(__dirname, 'views'))
+app.set('view engine', 'ejs')
+// Our fake database:
 let comments = [
     {
         id: uuid(),
@@ -34,50 +32,20 @@ let comments = [
         username: 'onlysayswoof',
         comment: 'woof woof woof'
     }
-];
-
-// Home route
-app.get('/', (req, res) => {
-    res.redirect('/comments');
-});
-
-// Show all comments
+]
 app.get('/comments', (req, res) => {
     res.render('comments/index', { comments });
-});
-
-// Form to create a new comment
+})
 app.get('/comments/new', (req, res) => {
     res.render('comments/new');
-});
-
-// Create a new comment
+})
+// CREATE - creates a new comment
+// **********************************
 app.post('/comments', (req, res) => {
     const { username, comment } = req.body;
-
-    comments.push({
-        id: uuid(),
-        username,
-        comment
-    });
-
+    comments.push({ username, comment, id: uuid() })
     res.redirect('/comments');
-});
-
-// Show one specific comment
-app.get('/comments/:id', (req, res) => {
-    const { id } = req.params;
-
-    const comment = comments.find(c => c.id === id);
-
-    if (!comment) {
-        return res.status(404).send('Comment not found!');
-    }
-
-    res.render('comments/show', { comment });
-});
-
-// Start server
+})
 app.listen(8000, () => {
-    console.log('ON PORT 8000!');
-});
+    console.log("ON PORT 8000!")
+})
